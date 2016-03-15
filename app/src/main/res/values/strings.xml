@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MapInfoPlayground</string>
+    <string name="title_tracking">Trip Detail</string>
 </resources>
