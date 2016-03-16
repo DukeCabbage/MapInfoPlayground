@@ -1,4 +1,10 @@
 <resources>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
+        AIzaSyAC2Ff5DloGEuuQ76pXk8BMWocCEvjr7AQ
+    </string>
+
     <string name="app_name">MapInfoPlayground</string>
     <string name="title_tracking">Trip Detail</string>
+    <string name="call_company">Call company</string>
+    <string name="cancel_trip">Cancel trip</string>
 </resources>

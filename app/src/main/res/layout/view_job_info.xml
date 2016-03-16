@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="bookingVM"
+            type="com.cabbage.mapinfoplayground.VMBooking"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="36dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhiteSmoke"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/btn_call_company"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@null"
+                    android:tint="@color/colorAccent"
+                    app:srcCompat="@drawable/ic_call_24dp"
+                    tools:src="@drawable/ic_call_24dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="26dp"
+                    android:text="@string/call_company"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorAccent"/>
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btn_cancel_trip"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:contentDescription="@null"
+                    android:tint="@color/colorAccent"
+                    app:srcCompat="@drawable/ic_clear_24dp"
+                    tools:src="@drawable/ic_clear_24dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="26dp"
+                    android:text="@string/cancel_trip"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorAccent"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_my_location_24dp"
+                tools:src="@drawable/ic_my_location_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="11920 Forge Place"
+                tools:text="11920 Forge Place"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_place_24dp"
+                tools:src="@drawable/ic_place_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="355 Burrard Street"
+                tools:text="355 Burrard Street"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_access_time_24dp"
+                tools:src="@drawable/ic_access_time_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="As soon as possible"
+                tools:text="As soon as possible"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_credit_card_24dp"
+                tools:src="@drawable/ic_credit_card_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="ZoroPay"
+                tools:text="ZoroPay"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_local_taxi_24dp"
+                tools:src="@drawable/ic_local_taxi_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="Sedan"
+                tools:text="Sedan"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                android:clickable="true"
+                android:background="?selectableItemBackgroundBorderless"
+                android:tint="@color/colorAccent"
+                app:srcCompat="@drawable/ic_message_24dp"
+                tools:src="@drawable/ic_message_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="'My buzzer code is 830'"
+                tools:text="'My buzzer code is 830'"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</layout>
