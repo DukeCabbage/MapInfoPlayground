@@ -22,13 +22,21 @@ import com.google.android.m4b.maps.GoogleMap;
 import com.google.android.m4b.maps.OnMapReadyCallback;
 import com.google.android.m4b.maps.SupportMapFragment;
 
+import java.util.concurrent.TimeUnit;
+
 import butterknife.Bind;
 import butterknife.BindColor;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class TrackingActivity extends AppCompatActivity
         implements OnMapReadyCallback {
+
+    private final static int INTERVAL = 1000 * 30; // 30 second
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
 
@@ -42,8 +50,12 @@ public class TrackingActivity extends AppCompatActivity
     @BindColor(R.color.colorBlack) int colorBlack;
     @BindColor(R.color.colorAccent) int colorAccent;
 
+    private DBBooking dbBook;
+
     private SupportMapFragment mMapFragment;
     private GoogleMap mGoogleMap;
+
+    private Subscription recallJobSubscription;
 
     private ArgbEvaluator mArgbEvaluator = new ArgbEvaluator();
 
@@ -53,12 +65,15 @@ public class TrackingActivity extends AppCompatActivity
         setContentView(R.layout.activity_tracking);
         ButterKnife.bind(this);
 
+//        dbBook = (DBBooking) getIntent().getSerializableExtra(MBDefinition.DBBOOKING_EXTRA);
+        dbBook = JobMockUp.getMockBooking();
+
         setUpAppBar();
         setUpBottomSheet();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mMapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMapFragment.getMapAsync(this);
     }
 
     private void setUpAppBar() {
@@ -136,7 +151,30 @@ public class TrackingActivity extends AppCompatActivity
         });
 
         // Due to the margin top, has to setState at the beginning, otherwise will be hiden
-        bottomSheet.post( ()-> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
+        bottomSheet.post(() -> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Timber.d("onResume");
+
+        recallJobSubscription = Observable.interval(0, INTERVAL, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap((Long l) -> Observable.just("Timer"))
+                .subscribe((String s) -> Timber.d(s));
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Timber.d("onPause");
+        if (recallJobSubscription != null && !recallJobSubscription.isUnsubscribed()) {
+            recallJobSubscription.unsubscribe();
+        }
     }
 
     @Override
