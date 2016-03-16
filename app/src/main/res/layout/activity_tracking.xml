@@ -33,7 +33,7 @@
                 android:id="@+id/zoro_pay_banner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorZoroOrange"
                 android:paddingLeft="24dp"
                 android:paddingRight="24dp"
                 android:paddingTop="16dp"
@@ -81,8 +81,10 @@
         <LinearLayout
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
-            android:layout_height="360dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/colorWhite"
+            android:elevation="4dp"
             android:orientation="vertical"
             app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
             app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
@@ -137,8 +139,7 @@
 
             <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content">
 
                 <include layout="@layout/view_job_info"
                          android:id="@+id/bottom_job_info"

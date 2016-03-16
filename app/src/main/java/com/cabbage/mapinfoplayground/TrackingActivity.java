@@ -74,7 +74,7 @@ public class TrackingActivity extends AppCompatActivity
 
     private void setUpBottomSheet() {
         // State change callback
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -108,11 +108,11 @@ public class TrackingActivity extends AppCompatActivity
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 // Collapsed: offset = 0.0, Expanded: offset = 1.0
-                Timber.d("slide offset: " + slideOffset);
+                Timber.i("slide offset: " + slideOffset);
 
                 // Screw the slideOffset, such that if favors 'expanded' state
-                float mappedOffset = (float) Math.pow((slideOffset - 1.0), 9.0) + 1;
-                Timber.d("new offset: " + mappedOffset);
+                float mappedOffset = (float) Math.pow((slideOffset - 1.0), 21.0) + 1;
+                Timber.i("new offset: " + mappedOffset);
                 int backgroundColor = (Integer) mArgbEvaluator.evaluate(mappedOffset, colorWhite, colorAccent);
                 int textColor = (Integer) mArgbEvaluator.evaluate(mappedOffset, colorBlack, colorWhite);
                 bottomSheetLabel.setBackgroundColor(backgroundColor);
@@ -123,7 +123,7 @@ public class TrackingActivity extends AppCompatActivity
 
         // Onclick callback
         bottomSheetLabel.setOnClickListener((View v) -> {
-            Timber.d("onClick");
+            Timber.i("onClick");
             BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
             switch (bottomSheetBehavior.getState()) {
                 case BottomSheetBehavior.STATE_COLLAPSED:
@@ -134,6 +134,9 @@ public class TrackingActivity extends AppCompatActivity
                     break;
             }
         });
+
+        // Due to the margin top, has to setState at the beginning, otherwise will be hiden
+        bottomSheet.post( ()-> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
     }
 
     @Override

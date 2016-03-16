@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="36dp"
+        android:paddingBottom="24dp"
         android:background="@android:color/white"
         android:orientation="vertical">
 
@@ -192,6 +192,96 @@
                 style="@style/TripInfoListItemLabel"
                 android:text="'My buzzer code is 830'"
                 tools:text="'My buzzer code is 830'"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
+        </FrameLayout>
+
+        <FrameLayout
+            style="@style/TripInfoListItem">
+
+            <ImageView
+                style="@style/TripInfoListItemIcon"
+                android:contentDescription="@null"
+                app:srcCompat="@drawable/ic_location_city_24dp"
+                tools:src="@drawable/ic_location_city_24dp"/>
+
+            <TextView
+                style="@style/TripInfoListItemLabel"
+                android:text="MetroTaxi"
+                tools:text="MetroTaxi"/>
         </FrameLayout>
 
     </LinearLayout>
