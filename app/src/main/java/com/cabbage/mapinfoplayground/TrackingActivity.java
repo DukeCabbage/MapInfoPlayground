@@ -1,42 +1,34 @@
 package com.cabbage.mapinfoplayground;
 
 import android.animation.ArgbEvaluator;
+import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.cabbage.mapinfoplayground.databinding.ActivityTrackingBinding;
 import com.google.android.m4b.maps.GoogleMap;
 import com.google.android.m4b.maps.OnMapReadyCallback;
 import com.google.android.m4b.maps.SupportMapFragment;
 
-import java.util.concurrent.TimeUnit;
-
 import butterknife.Bind;
+import butterknife.BindArray;
 import butterknife.BindColor;
 import butterknife.ButterKnife;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 public class TrackingActivity extends AppCompatActivity
         implements OnMapReadyCallback {
-
-    private final static int INTERVAL = 1000 * 30; // 30 second
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
 
@@ -50,24 +42,33 @@ public class TrackingActivity extends AppCompatActivity
     @BindColor(R.color.colorBlack) int colorBlack;
     @BindColor(R.color.colorAccent) int colorAccent;
 
-    private DBBooking dbBook;
+    @BindArray(R.array.trip_status) String[] tripStatus;
+    @BindArray(R.array.trip_status_title) String[] tripStatusTitle;
+
+    private BookingViewModel mViewModel;
+    private TrackingDelegate mDelegate;
+
+    private TripStatus currentTripStatus;
 
     private SupportMapFragment mMapFragment;
     private GoogleMap mGoogleMap;
-
-    private Subscription recallJobSubscription;
 
     private ArgbEvaluator mArgbEvaluator = new ArgbEvaluator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tracking);
+        // TODO: parse from intent
+        mViewModel = new BookingViewModel(this, JobMockUp.getMockBooking());
+        mDelegate = new MockTrackingDelegate(this);
+
+        // Data binding
+        ActivityTrackingBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_tracking);
+        binding.setViewModel(mViewModel);
+        binding.setDelegate(mDelegate);
+
+        // Other view setups
         ButterKnife.bind(this);
-
-//        dbBook = (DBBooking) getIntent().getSerializableExtra(MBDefinition.DBBOOKING_EXTRA);
-        dbBook = JobMockUp.getMockBooking();
-
         setUpAppBar();
         setUpBottomSheet();
 
@@ -93,7 +94,7 @@ public class TrackingActivity extends AppCompatActivity
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                Timber.d("new State: " + newState);
+                Timber.i("new State: " + newState);
                 switch (newState) {
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         // Light background, dark text, arrow up
@@ -123,11 +124,11 @@ public class TrackingActivity extends AppCompatActivity
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 // Collapsed: offset = 0.0, Expanded: offset = 1.0
-                Timber.i("slide offset: " + slideOffset);
+                Timber.d("slide offset: " + slideOffset);
 
                 // Screw the slideOffset, such that if favors 'expanded' state
                 float mappedOffset = (float) Math.pow((slideOffset - 1.0), 21.0) + 1;
-                Timber.i("new offset: " + mappedOffset);
+                Timber.d("new offset: " + mappedOffset);
                 int backgroundColor = (Integer) mArgbEvaluator.evaluate(mappedOffset, colorWhite, colorAccent);
                 int textColor = (Integer) mArgbEvaluator.evaluate(mappedOffset, colorBlack, colorWhite);
                 bottomSheetLabel.setBackgroundColor(backgroundColor);
@@ -138,66 +139,84 @@ public class TrackingActivity extends AppCompatActivity
 
         // Onclick callback
         bottomSheetLabel.setOnClickListener((View v) -> {
-            Timber.i("onClick");
+            Timber.i("bottom sheet label onClick");
             BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+            Timber.i("current state: " + bottomSheetBehavior.getState());
             switch (bottomSheetBehavior.getState()) {
-                case BottomSheetBehavior.STATE_COLLAPSED:
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                    break;
                 case BottomSheetBehavior.STATE_EXPANDED:
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     break;
+                default:
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
         });
 
-        // Due to the margin top, has to setState at the beginning, otherwise will be hiden
-        bottomSheet.post(() -> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
+        // Due to the margin top, has to setState at the beginning, otherwise will be hidden
+//        bottomSheet.post(() -> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
+    }
+
+    public void setTripStage(TripStatus status) {
+        String title = tripStatusTitle[status.ordinal()];
+        if (getSupportActionBar() != null ) {
+            getSupportActionBar().setTitle(title);
+        }
+
+        mViewModel.mModel.setTripStatus(status.ordinal());
+        mViewModel.notifyChange();
+
+        if (shouldShowMap(status)) {
+            mMapFragment.getView().setVisibility(View.VISIBLE);
+            CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) bottomSheet.getLayoutParams();
+            lp.height = CoordinatorLayout.LayoutParams.WRAP_CONTENT;
+            bottomSheet.requestLayout();
+            bottomSheet.post(() -> BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_COLLAPSED));
+
+        } else {
+            mMapFragment.getView().setVisibility(View.GONE);
+            CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) bottomSheet.getLayoutParams();
+            lp.height = CoordinatorLayout.LayoutParams.MATCH_PARENT;
+            bottomSheet.requestLayout();
+            bottomSheet.post(() -> BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED));
+        }
+    }
+
+    private boolean shouldShowMap(TripStatus status) {
+        switch (status) {
+            case DISPATCHED:
+            case ARRIVED:
+            case IN_SERVICE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
     public void onResume() {
+        Timber.i("onResume");
         super.onResume();
-        Timber.d("onResume");
 
-        recallJobSubscription = Observable.interval(0, INTERVAL, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .flatMap((Long l) -> Observable.just("Timer"))
-                .subscribe((String s) -> Timber.d(s));
-
+        mDelegate.startRefreshing();
     }
 
     @Override
     public void onPause() {
+        Timber.i("onPause");
         super.onPause();
-        Timber.d("onPause");
-        if (recallJobSubscription != null && !recallJobSubscription.isUnsubscribed()) {
-            recallJobSubscription.unsubscribe();
-        }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_tracking, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.menu_refresh:
-                Toast.makeText(this, "Refresh", Toast.LENGTH_SHORT).show();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        mDelegate.stopRefreshing();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.mGoogleMap = googleMap;
+    }
+
+    public TrackingDelegate getTrackingDelegate() {
+        return mDelegate;
+    }
+
+    public BookingViewModel getBookingViewModel() {
+        return mViewModel;
     }
 }

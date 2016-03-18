@@ -7,4 +7,26 @@
     <string name="title_tracking">Trip Detail</string>
     <string name="call_company">Call company</string>
     <string name="cancel_trip">Cancel trip</string>
+
+
+
+
+    <array name="trip_status">
+        <item>Booked</item>
+        <item>Dispatched</item>
+        <item>Arrived</item>
+        <item>On board</item>
+        <item>Completed</item>
+        <item>Canceled</item>
+    </array>
+
+    <array name="trip_status_title">
+        <item>Looking for a car...</item>
+        <item>Car is coming...</item>
+        <item>Your car has arrived!</item>
+        <item>Enjoy your ride!</item>
+        <item>Trip history</item>
+        <item>Trip history</item>
+    </array>
+
 </resources>
