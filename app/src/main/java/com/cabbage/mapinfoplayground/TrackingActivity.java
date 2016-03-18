@@ -11,6 +11,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.DragEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,6 +29,7 @@ import com.google.android.m4b.maps.SupportMapFragment;
 import butterknife.Bind;
 import butterknife.BindArray;
 import butterknife.BindColor;
+import butterknife.BindDimen;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
@@ -31,7 +37,7 @@ public class TrackingActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
     @Bind(R.id.toolbar) Toolbar mToolbar;
-
+    @Bind(R.id.zoro_pay_banner) ViewGroup zoroPayBanner;
     @Bind(R.id.bottom_sheet) ViewGroup bottomSheet;
     @Bind(R.id.bottom_sheet_label) ViewGroup bottomSheetLabel;
     @Bind(R.id.tv_company_name) TextView tvCompanyName;
@@ -41,6 +47,8 @@ public class TrackingActivity extends AppCompatActivity
     @BindColor(R.color.colorWhite) int colorWhite;
     @BindColor(R.color.colorBlack) int colorBlack;
     @BindColor(R.color.colorAccent) int colorAccent;
+
+    @BindDimen(R.dimen.action_bar_size) int actionBarSize;
 
     @BindArray(R.array.trip_status) String[] tripStatus;
     @BindArray(R.array.trip_status_title) String[] tripStatusTitle;
@@ -72,8 +80,7 @@ public class TrackingActivity extends AppCompatActivity
         setUpAppBar();
         setUpBottomSheet();
 
-        mMapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
     }
 
@@ -141,6 +148,7 @@ public class TrackingActivity extends AppCompatActivity
         bottomSheetLabel.setOnClickListener((View v) -> {
             Timber.i("bottom sheet label onClick");
             BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
             Timber.i("current state: " + bottomSheetBehavior.getState());
             switch (bottomSheetBehavior.getState()) {
                 case BottomSheetBehavior.STATE_EXPANDED:
@@ -155,29 +163,85 @@ public class TrackingActivity extends AppCompatActivity
 //        bottomSheet.post(() -> behavior.setState(BottomSheetBehavior.STATE_COLLAPSED));
     }
 
-    public void setTripStage(TripStatus status) {
-        String title = tripStatusTitle[status.ordinal()];
-        if (getSupportActionBar() != null ) {
+    public void setTripStage(TripStatus newStatus) {
+        Timber.i("Changing stage: " + newStatus.toString());
+
+        String title = tripStatusTitle[newStatus.ordinal()];
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(title);
         }
 
-        mViewModel.mModel.setTripStatus(status.ordinal());
-        mViewModel.notifyChange();
+//        mViewModel.mModel.setTripStatus(newStatus.ordinal());
+//        mViewModel.notifyChange();
 
-        if (shouldShowMap(status)) {
+
+        if (shouldShowMap(newStatus)) {
+            // Show map, enable bottom sheet
+            bottomSheetLabel.setVisibility(View.VISIBLE);
+            bottomSheetLabel.setClickable(true);
             mMapFragment.getView().setVisibility(View.VISIBLE);
+
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) bottomSheet.getLayoutParams();
             lp.height = CoordinatorLayout.LayoutParams.WRAP_CONTENT;
+            lp.topMargin = shouldShowZoroPayCode(newStatus) ? 2 * actionBarSize : actionBarSize;
+//            lp.setBehavior(new android.support.design.widget.BottomSheetBehavior<>());
             bottomSheet.requestLayout();
-            bottomSheet.post(() -> BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_COLLAPSED));
+
+            bottomSheet.post(() -> {
+                Timber.e("collapse");
+                try {
+//                    BottomSheetBehavior.from(bottomSheet).setPeekHeight(actionBarSize);
+                    BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_COLLAPSED);
+//                    setUpBottomSheet();
+//                    bottomSheet.requestLayout();
+//                    BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            });
 
         } else {
+            // Hide map, disable bottom sheet
+            bottomSheetLabel.setVisibility(View.GONE);
+            bottomSheetLabel.setClickable(false);
             mMapFragment.getView().setVisibility(View.GONE);
+
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) bottomSheet.getLayoutParams();
             lp.height = CoordinatorLayout.LayoutParams.MATCH_PARENT;
+            lp.topMargin = shouldShowZoroPayCode(newStatus) ? 2 * actionBarSize : actionBarSize;
+
             bottomSheet.requestLayout();
-            bottomSheet.post(() -> BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED));
+
+            bottomSheet.setOnDragListener(new View.OnDragListener() {
+                @Override
+                public boolean onDrag(View v, DragEvent event) {
+                    return true;
+                }
+            });
+
+            bottomSheet.post(() -> {
+                Timber.e("expand");
+                try {
+                    BottomSheetBehavior.from(bottomSheet).setState(BottomSheetBehavior.STATE_EXPANDED);
+//                    lp.setBehavior(null);
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                }
+            });
         }
+
+        zoroPayBanner.setVisibility(shouldShowZoroPayCode(newStatus) ? View.VISIBLE : View.GONE);
+
+        currentTripStatus = newStatus;
+    }
+
+    private boolean shouldShowZoroPayCode(TripStatus status) {
+        if (!mViewModel.mModel.getZoroPayEnable())
+            return false;
+
+        return status == TripStatus.BOOKED ||
+                status == TripStatus.DISPATCHED ||
+                status == TripStatus.ARRIVED;
     }
 
     private boolean shouldShowMap(TripStatus status) {
@@ -196,7 +260,7 @@ public class TrackingActivity extends AppCompatActivity
         Timber.i("onResume");
         super.onResume();
 
-        mDelegate.startRefreshing();
+//        mDelegate.startRefreshing();
     }
 
     @Override
@@ -205,6 +269,28 @@ public class TrackingActivity extends AppCompatActivity
         super.onPause();
 
         mDelegate.stopRefreshing();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_tracking, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                if (currentTripStatus == null) {
+                    setTripStage(TripStatus.BOOKED);
+                } else if (currentTripStatus.ordinal() < 5) {
+                    setTripStage(TripStatus.values()[currentTripStatus.ordinal() + 1]);
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

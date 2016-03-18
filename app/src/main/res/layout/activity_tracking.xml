@@ -34,13 +34,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
-            <include
-                android:id="@+id/standalone_job_info"
-                layout="@layout/view_job_info"
-                android:visibility="gone"
-                tools:visibility="gone"
-                bind:delegate="@{delegate}"
-                bind:viewModel="@{viewModel}"/>
+            <!--<include-->
+                <!--android:id="@+id/standalone_job_info"-->
+                <!--layout="@layout/view_job_info"-->
+                <!--android:visibility="gone"-->
+                <!--tools:visibility="gone"-->
+                <!--bind:delegate="@{delegate}"-->
+                <!--bind:viewModel="@{viewModel}"/>-->
         </RelativeLayout>
 
         <LinearLayout
@@ -107,6 +107,7 @@
             </FrameLayout>
 
             <android.support.v4.widget.NestedScrollView
+                android:id="@+id/bottom_sheet_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -142,7 +143,6 @@
                 android:background="@color/colorZoroOrange"
                 android:paddingLeft="24dp"
                 android:paddingRight="24dp"
-                bind:visibility="@{viewModel.needZoroPayCode ? View.VISIBLE : View.GONE}"
                 tools:visibility="visible">
 
                 <TextView

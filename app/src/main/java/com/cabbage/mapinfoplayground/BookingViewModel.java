@@ -83,9 +83,4 @@ public class BookingViewModel extends BaseViewModel<DBBooking> {
 
         return ("\"" + driverNote + "\"");
     }
-
-    public boolean needZoroPayCode() {
-        int statusCode = mModel.getTripStatus();
-        return mModel.getZoroPayEnable() && (statusCode < 3);
-    }
 }

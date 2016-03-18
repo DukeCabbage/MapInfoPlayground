@@ -10,7 +10,6 @@
 
 
 
-
     <array name="trip_status">
         <item>Booked</item>
         <item>Dispatched</item>
@@ -25,8 +24,8 @@
         <item>Car is coming...</item>
         <item>Your car has arrived!</item>
         <item>Enjoy your ride!</item>
-        <item>Trip history</item>
-        <item>Trip history</item>
+        <item>Trip Completed</item>
+        <item>Trip Canceled</item>
     </array>
 
 </resources>
